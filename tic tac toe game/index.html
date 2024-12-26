@@ -1,0 +1,140 @@
+def print_board(board):
+    for row in board:
+        print(" | ".join(row))
+        print("-" * 9)
+
+def check_winner(board):
+    # Check rows, columns, and diagonals for a winner
+    for i in range(3):
+        if board[i][0] == board[i][1] == board[i][2] != " ":
+            return board[i][0]
+        if board[0][i] == board[1][i] == board[2][i] != " ":
+            return board[0][i]
+    
+    if board[0][0] == board[1][1] == board[2][2] != " ":
+        return board[0][0]
+    if board[0][2] == board[1][1] == board[2][0] != " ":
+        return board[0][2]
+    
+    return None
+
+def is_full(board):
+    return all(cell != " " for row in board for cell in row)
+
+def tic_tac_toe():
+    board = [[" " for _ in range(3)] for _ in range(3)]
+    current_player = "X"
+
+    while True:
+        print_board(board)
+        try:
+            row = int(input(f"Player {current_player}, enter row (0-2): "))
+            col = int(input(f"Player {current_player}, enter column (0-2): "))
+            
+            if board[row][col] != " ":
+                print("Cell already taken, try again.")
+                continue
+            
+            board[row][col] = current_player
+            
+            winner = check_winner(board)
+            if winner:
+                print_board(board)
+                print(f"Player {winner} wins!")
+                break
+            
+            if is_full(board):
+                print_board(board)
+                print("It's a draw!")
+                break
+            
+            current_player = "O" if current_player == "X" else "X"
+        except (ValueError, IndexError):
+            print("Invalid input, please enter numbers between 0 and 2.")
+
+if __name__ == "__main__":
+    tic_tac_toe()
+
+
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .board { display: grid; grid-template-columns: repeat(3, 100px); gap: 5px; }
+        .cell { width: 100px; height: 100px; text-align: center; font-size: 24px; border: 1px solid #000; cursor: pointer; }
+        .winner { color: green; }
+    </style>
+</head>
+<body>
+
+<h1>Tic Tac Toe</h1>
+<div class="board" id="board"></div>
+<h2 id="status"></h2>
+
+<script>
+const boardElement = document.getElementById('board');
+const statusElement = document.getElementById('status');
+let currentPlayer = 'X';
+let board = Array(3).fill().map(() => Array(3).fill(' '));
+
+function renderBoard() {
+    boardElement.innerHTML = '';
+    for (let row = 0; row < 3; row++) {
+        for (let col = 0; col < 3; col++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.textContent = board[row][col];
+            cell.onclick = () => makeMove(row, col);
+            boardElement.appendChild(cell);
+        }
+    }
+}
+
+function makeMove(row, col) {
+    if (board[row][col] === ' ') {
+        board[row][col] = currentPlayer;
+        if (checkWinner()) {
+            statusElement.textContent = `Player ${currentPlayer} wins!`;
+            statusElement.className = 'winner';
+        } else if (isFull()) {
+            statusElement.textContent = "It's a draw!";
+        } else {
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            renderBoard();
+        }
+    }
+}
+
+function checkWinner() {
+    const winningCombinations = [
+        [[0, 0], [0, 1], [0, 2]],
+        [[1, 0], [1, 1], [1, 2]],
+        [[2, 0], [2, 1], [2, 2]],
+        [[0, 0], [1, 0], [2, 0]],
+        [[0, 1], [1, 1], [2, 1]],
+        [[0, 2], [1, 2], [2, 2]],
+        [[0, 0], [1, 1], [2, 2]],
+        [[0, 2], [1, 1], [2, 0]]
+    ];
+    
+    return winningCombinations.some(combination => {
+        const [[a,b],[c,d],[e,f]] = combination;
+        return board[a][b] === currentPlayer && 
+               board[c][d] === currentPlayer && 
+               board[e][f] === currentPlayer;
+    });
+}
+
+function isFull() {
+    return board.flat().every(cell => cell !== ' ');
+}
+
+renderBoard();
+</script>
+
+</body>
+</html>
